@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: kernel-api
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+  - type: static
+    name: kernel-docs
+    buildCommand: echo "Static site, no build needed"
+    staticPublishPath: ./public
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

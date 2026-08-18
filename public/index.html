@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>Kernel — Documentation that developers actually want to use</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html,
+        body {
+            min-height: 100vh;
+            min-height: 100dvh;
+            width: 100%;
+            overflow-x: hidden;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #FAFAF8;
+            color: #1A1A1A;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+        :root {
+            --color-primary: #1A1A1A;
+            --color-secondary: #2B6CB0;
+            --color-accent: #E8A838;
+            --color-bg: #FAFAF8;
+            --color-surface: #FFFFFF;
+            --color-text: #1A1A1A;
+            --color-text-secondary: #4A4A4A;
+            --color-text-tertiary: #7A7A7A;
+            --color-border: #E8E6E1;
+            --color-focus: #2B6CB0;
+            --color-success: #2B6CB0;
+            --color-error: #C0392B;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+            --space-4xl: 6rem;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.08);
+            --transition-fast: 150ms ease;
+            --transition-base: 250ms ease;
+            --header-height: 72px;
+            --header-height-mobile: 64px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        :focus-visible {
+            outline: 2px solid var(--color-focus);
+            outline-offset: 2px;
+            border-radius: var(--radius-sm);
+        }
+        .skip-link {
+            position: absolute;
+            top: -100%;
+            left: var(--space-lg);
+            padding: var(--space-sm) var(--space-lg);
+            background: var(--color-primary);
+            color: #fff;
+            border-radius: var(--radius-sm);
+            z-index: 9999;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: top var(--transition-fast);
+        }
+        .skip-link:focus {
+            top: var(--space-md);
+        }
+        #app {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            min-height: 100dvh;
+            width: 100%;
+        }
+        main {
+            flex: 1 0 auto;
+            width: 100%;
+        }
+        .container {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+            width: 100%;
+        }
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            font-family: var(--font-sans);
+            font-size: 0.9375rem;
+            font-weight: 600;
+            padding: 0.625rem 1.5rem;
+            border-radius: var(--radius-md);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-decoration: none;
+            line-height: 1.4;
+            min-height: 2.75rem;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-primary {
+            background: var(--color-primary);
+            color: #fff;
+            border-color: var(--color-primary);
+        }
+        .btn-primary:hover,
+        .btn-primary:focus-visible {
+            background: #2d2d2d;
+            border-color: #2d2d2d;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: var(--color-primary);
+            border-color: var(--color-border);
+        }
+        .btn-secondary:hover,
+        .btn-secondary:focus-visible {
+            background: var(--color-surface);
+            border-color: var(--color-text-secondary);
+            transform: translateY(-1px);
+        }
+        .btn-secondary:active {
+            transform: scale(0.97);
+        }
+        .btn-accent {
+            background: var(--color-accent);
+            color: var(--color-primary);
+            border-color: var(--color-accent);
+        }
+        .btn-accent:hover,
+        .btn-accent:focus-visible {
+            background: #d99a2e;
+            border-color: #d99a2e;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        .btn-accent:active {
+            transform: scale(0.97);
+        }
+        .btn-sm {
+            font-size: 0.8125rem;
+            padding: 0.375rem 1rem;
+            min-height: 2.25rem;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .toast {
+            position: fixed;
+            bottom: var(--space-xl);
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            background: var(--color-primary);
+            color: #fff;
+            padding: var(--space-md) var(--space-xl);
+            border-radius: var(--radius-md);
+            font-size: 0.9375rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 9999;
+            pointer-events: none;
+            max-width: 90%;
+            text-align: center;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        .toast.error {
+            background: var(--color-error);
+        }
+        .toast.success {
+            background: var(--color-success);
+        }
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: var(--space-md);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--space-2xl);
+            max-width: 440px;
+            width: 100%;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            animation: modalIn 0.3s ease;
+            margin: var(--space-md);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .modal-close {
+            position: absolute;
+            top: var(--space-md);
+            right: var(--space-md);
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--color-text-tertiary);
+            padding: var(--space-xs);
+            border-radius: var(--radius-sm);
+            line-height: 1;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-close:hover {
+            color: var(--color-primary);
+        }
+        .modal h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space-xs);
+            letter-spacing: -0.02em;
+        }
+        .modal p {
+            color: var(--color-text-secondary);
+            font-size: 0.9375rem;
+            margin-bottom: var(--space-lg);
+        }
+        .form-group {
+            margin-bottom: var(--space-md);
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: var(--space-xs);
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-family: var(--font-sans);
+            font-size: 0.9375rem;
+            transition: border-color var(--transition-fast);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-secondary);
+        }
+        .form-group input.error {
+            border-color: var(--color-error);
+        }
+        .form-error {
+            color: var(--color-error);
+            font-size: 0.8125rem;
+            margin-top: var(--space-xs);
+            display: none;
+        }
+        .form-error.visible {
+            display: block;
+        }
+        .modal .btn {
+            width: 100%;
+            justify-content: center;
+            margin-top: var(--space-sm);
+        }
+        .modal .switch-action {
+            text-align: center;
+            margin-top: var(--space-md);
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+        .modal .switch-action button {
+            background: none;
+            border: none;
+            color: var(--color-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.875rem;
+            padding: var(--space-xs);
+        }
+        .modal .switch-action button:hover {
+            text-decoration: underline;
+        }
+        .site-header {
+            padding: var(--space-md) 0;
+            border-bottom: 1px solid var(--color-border);
+            background: var(--color-surface);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.92);
+            width: 100%;
+            flex-shrink: 0;
+        }
+        .site-header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            min-height: var(--header-height-mobile);
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            text-decoration: none;
+            color: var(--color-primary);
+            font-weight: 700;
+            font-size: 1.125rem;
+            letter-spacing: -0.02em;
+            cursor: pointer;
+            flex-shrink: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .logo-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            background: var(--color-primary);
+            color: #fff;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+        .logo span {
+            color: var(--color-text-secondary);
+            font-weight: 400;
+        }
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+        .nav a {
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color var(--transition-fast);
+            padding: var(--space-xs) 0;
+            position: relative;
+            cursor: pointer;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .nav a:hover,
+        .nav a:focus-visible {
+            color: var(--color-primary);
+        }
+        .nav a[aria-current="page"] {
+            color: var(--color-primary);
+        }
+        .nav a[aria-current="page"]::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--color-secondary);
+            border-radius: 2px;
+        }
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            flex-shrink: 0;
+        }
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: var(--space-sm);
+            border-radius: var(--radius-sm);
+            flex-shrink: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .nav-toggle span {
+            display: block;
+            width: 1.5rem;
+            height: 2px;
+            background: var(--color-primary);
+            transition: all var(--transition-fast);
+            border-radius: 2px;
+        }
+        .nav-toggle[aria-expanded="true"] span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .nav-toggle[aria-expanded="true"] span:nth-child(2) {
+            opacity: 0;
+        }
+        .nav-toggle[aria-expanded="true"] span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: 0.8125rem;
+            color: var(--color-text-secondary);
+            flex-wrap: wrap;
+        }
+        .user-info .user-name {
+            font-weight: 500;
+            color: var(--color-primary);
+        }
+        .user-info .user-plan {
+            background: rgba(43, 108, 176, 0.08);
+            padding: 0.125rem 0.5rem;
+            border-radius: 100px;
+            font-size: 0.6875rem;
+            font-weight: 500;
+            color: var(--color-secondary);
+        }
+        .hero {
+            padding: var(--space-3xl) 0;
+            background: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            width: 100%;
+        }
+        .hero .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-2xl);
+            align-items: center;
+        }
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: var(--color-secondary);
+            background: rgba(43, 108, 176, 0.08);
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+            width: fit-content;
+            border: 1px solid rgba(43, 108, 176, 0.12);
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+        .hero h1 .highlight {
+            color: var(--color-secondary);
+        }
+        .hero p {
+            font-size: clamp(1rem, 1.2vw, 1.125rem);
+            color: var(--color-text-secondary);
+            max-width: 32rem;
+            line-height: 1.7;
+        }
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+            margin-top: var(--space-sm);
+        }
+        .hero-image {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        .hero-image .code-block {
+            width: 100%;
+            background: var(--color-primary);
+            color: #e4e4e4;
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            font-family: var(--font-mono);
+            font-size: clamp(0.6875rem, 0.9vw, 0.8125rem);
+            line-height: 1.8;
+            overflow-x: auto;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            -webkit-overflow-scrolling: touch;
+        }
+        .hero-image .code-block .comment {
+            color: #7a7a7a;
+        }
+        .hero-image .code-block .keyword {
+            color: #e8a838;
+        }
+        .hero-image .code-block .string {
+            color: #7cb8e8;
+        }
+        .hero-image .code-block .function {
+            color: #8ccb8c;
+        }
+        .hero-image .code-block .variable {
+            color: #e8a838;
+        }
+        .features {
+            padding: var(--space-3xl) 0;
+            background: var(--color-bg);
+            scroll-margin-top: 80px;
+            width: 100%;
+        }
+        .features-header {
+            text-align: center;
+            max-width: 48rem;
+            margin: 0 auto var(--space-2xl);
+        }
+        .features-header h2 {
+            font-size: clamp(1.75rem, 3vw, 2.5rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: var(--space-sm);
+        }
+        .features-header p {
+            color: var(--color-text-secondary);
+            font-size: clamp(1rem, 1.1vw, 1.0625rem);
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-lg);
+        }
+        .feature-card {
+            background: var(--color-surface);
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-border);
+            transition: all var(--transition-base);
+            cursor: default;
+            height: 100%;
+        }
+        .feature-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .feature-card .icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: var(--radius-sm);
+            background: rgba(43, 108, 176, 0.08);
+            color: var(--color-secondary);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+        }
+        .feature-card h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: var(--space-xs);
+        }
+        .feature-card p {
+            font-size: 0.9375rem;
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+        .code-demo {
+            padding: var(--space-3xl) 0;
+            background: var(--color-surface);
+            border-top: 1px solid var(--color-border);
+            border-bottom: 1px solid var(--color-border);
+            scroll-margin-top: 80px;
+            width: 100%;
+        }
+        .code-demo .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-2xl);
+            align-items: center;
+        }
+        .code-demo-content h2 {
+            font-size: clamp(1.5rem, 2.5vw, 2rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: var(--space-sm);
+        }
+        .code-demo-content p {
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-lg);
+            font-size: clamp(1rem, 1.1vw, 1.0625rem);
+        }
+        .code-demo-content ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+        .code-demo-content ul li {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: 0.9375rem;
+            color: var(--color-text-secondary);
+        }
+        .code-demo-content ul li::before {
+            content: "✓";
+            color: var(--color-secondary);
+            font-weight: 700;
+        }
+        .code-demo .code-block {
+            background: var(--color-primary);
+            color: #e4e4e4;
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            font-family: var(--font-mono);
+            font-size: clamp(0.625rem, 0.8vw, 0.8125rem);
+            line-height: 1.9;
+            overflow-x: auto;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            -webkit-overflow-scrolling: touch;
+        }
+        .code-demo .code-block .comment {
+            color: #7a7a7a;
+        }
+        .code-demo .code-block .keyword {
+            color: #e8a838;
+        }
+        .code-demo .code-block .string {
+            color: #7cb8e8;
+        }
+        .code-demo .code-block .function {
+            color: #8ccb8c;
+        }
+        .pricing {
+            padding: var(--space-3xl) 0;
+            background: var(--color-bg);
+            scroll-margin-top: 80px;
+            width: 100%;
+        }
+        .pricing-header {
+            text-align: center;
+            max-width: 40rem;
+            margin: 0 auto var(--space-2xl);
+        }
+        .pricing-header h2 {
+            font-size: clamp(1.75rem, 3vw, 2.5rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: var(--space-sm);
+        }
+        .pricing-header p {
+            color: var(--color-text-secondary);
+            font-size: clamp(1rem, 1.1vw, 1.0625rem);
+        }
+        .pricing-card {
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-border);
+            padding: var(--space-2xl);
+            text-align: center;
+            transition: all var(--transition-base);
+        }
+        .pricing-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .pricing-card .plan-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--color-secondary);
+            margin-bottom: var(--space-sm);
+        }
+        .pricing-card .price {
+            font-size: clamp(2.5rem, 4vw, 3rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        .pricing-card .price span {
+            font-size: 1.125rem;
+            font-weight: 400;
+            color: var(--color-text-tertiary);
+        }
+        .pricing-card .description {
+            color: var(--color-text-secondary);
+            margin: var(--space-md) 0 var(--space-lg);
+            font-size: 0.9375rem;
+        }
+        .pricing-card .features-list {
+            list-style: none;
+            text-align: left;
+            margin: var(--space-lg) 0;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+        .pricing-card .features-list li {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: 0.9375rem;
+            color: var(--color-text-secondary);
+        }
+        .pricing-card .features-list li::before {
+            content: "✓";
+            color: var(--color-secondary);
+            font-weight: 700;
+        }
+        .site-footer {
+            padding: var(--space-2xl) 0 var(--space-xl);
+            border-top: 1px solid var(--color-border);
+            background: var(--color-surface);
+            width: 100%;
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+        .site-footer .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+        .site-footer .copyright {
+            font-size: 0.875rem;
+            color: var(--color-text-tertiary);
+        }
+        .site-footer .footer-links {
+            display: flex;
+            gap: var(--space-lg);
+            flex-wrap: wrap;
+        }
+        .site-footer .footer-links a {
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color var(--transition-fast);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .site-footer .footer-links a:hover,
+        .site-footer .footer-links a:focus-visible {
+            color: var(--color-primary);
+        }
+        @media (max-width: 1024px) {
+            .hero .container {
+                grid-template-columns: 1fr;
+                gap: var(--space-2xl);
+                text-align: center;
+            }
+            .hero-content {
+                align-items: center;
+            }
+            .hero p {
+                max-width: 100%;
+            }
+            .hero-actions {
+                justify-content: center;
+            }
+            .code-demo .container {
+                grid-template-columns: 1fr;
+                gap: var(--space-2xl);
+            }
+            .code-demo-content {
+                text-align: center;
+            }
+            .code-demo-content ul {
+                align-items: center;
+            }
+            .features-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .container {
+                padding: 0 var(--space-md);
+            }
+        }
+        @media (max-width: 768px) {
+            :root {
+                --space-3xl: 2.5rem;
+                --space-4xl: 3rem;
+                --space-2xl: 2rem;
+            }
+            .container {
+                padding: 0 var(--space-md);
+                width: 100%;
+            }
+            .site-header .container {
+                min-height: var(--header-height-mobile);
+            }
+            .nav-toggle {
+                display: flex;
+            }
+            .nav {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                padding: var(--space-md) 0;
+                gap: var(--space-sm);
+                border-top: 1px solid var(--color-border);
+                margin-top: var(--space-sm);
+                align-items: stretch;
+            }
+            .nav.is-open {
+                display: flex;
+            }
+            .nav a {
+                padding: var(--space-sm) 0;
+                width: 100%;
+                font-size: 1rem;
+            }
+            .nav a[aria-current="page"]::after {
+                bottom: 0;
+            }
+            .nav-actions {
+                width: 100%;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+                gap: var(--space-sm);
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .nav-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .user-info {
+                width: 100%;
+                justify-content: flex-start;
+                padding: var(--space-sm) 0;
+                flex-wrap: wrap;
+            }
+            .user-info .btn {
+                width: auto;
+                margin-left: auto;
+            }
+            .hero {
+                padding: var(--space-2xl) 0;
+            }
+            .hero h1 {
+                font-size: clamp(1.75rem, 7vw, 2.25rem);
+            }
+            .hero p {
+                font-size: 1rem;
+            }
+            .hero-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            .hero-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .hero-image .code-block {
+                font-size: 0.625rem;
+                padding: var(--space-md);
+            }
+            .features {
+                padding: var(--space-2xl) 0;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-md);
+            }
+            .feature-card {
+                padding: var(--space-lg);
+            }
+            .code-demo {
+                padding: var(--space-2xl) 0;
+            }
+            .code-demo .code-block {
+                font-size: 0.625rem;
+                padding: var(--space-md);
+            }
+            .pricing {
+                padding: var(--space-2xl) 0;
+            }
+            .pricing-card {
+                padding: var(--space-lg);
+                margin: 0 var(--space-sm);
+            }
+            .pricing-card .price {
+                font-size: 2.25rem;
+            }
+            .site-footer .container {
+                flex-direction: column;
+                text-align: center;
+                gap: var(--space-md);
+            }
+            .site-footer .footer-links {
+                justify-content: center;
+            }
+            .modal {
+                padding: var(--space-lg);
+                margin: var(--space-sm);
+                max-width: 100%;
+            }
+        }
+        @media (max-width: 400px) {
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            .code-demo .code-block {
+                font-size: 0.5625rem;
+                padding: var(--space-sm);
+            }
+            .btn {
+                font-size: 0.875rem;
+                padding: 0.5rem 1rem;
+                min-height: 2.5rem;
+            }
+            .btn-sm {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.75rem;
+                min-height: 2rem;
+            }
+            .container {
+                padding: 0 var(--space-sm);
+            }
+            .hero-image .code-block {
+                font-size: 0.5625rem;
+                padding: var(--space-sm);
+            }
+            .feature-card {
+                padding: var(--space-md);
+            }
+            .pricing-card {
+                padding: var(--space-md);
+            }
+            .modal {
+                padding: var(--space-md);
+            }
+        }
+        @media (max-width: 375px) {
+            .logo {
+                font-size: 1rem;
+            }
+            .logo-icon {
+                width: 1.75rem;
+                height: 1.75rem;
+                font-size: 0.75rem;
+            }
+            .hero h1 {
+                font-size: 1.375rem;
+            }
+            .hero p {
+                font-size: 0.875rem;
+            }
+        }
+        @media (max-height: 500px) and (orientation: landscape) {
+            .hero {
+                padding: var(--space-xl) 0;
+            }
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            .hero .container {
+                gap: var(--space-lg);
+            }
+            .features {
+                padding: var(--space-xl) 0;
+            }
+            .code-demo {
+                padding: var(--space-xl) 0;
+            }
+            .pricing {
+                padding: var(--space-xl) 0;
+            }
+        }
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 1200px;
+            }
+            .hero h1 {
+                font-size: 4rem;
+            }
+            .hero {
+                padding: var(--space-4xl) 0;
+            }
+        }
+        @media print {
+            .site-header {
+                position: static;
+                backdrop-filter: none;
+                background: #fff;
+            }
+            .hero {
+                padding: var(--space-xl) 0;
+            }
+            .btn,
+            .nav-toggle,
+            .nav-actions,
+            .toast,
+            .modal-overlay {
+                display: none !important;
+            }
+            .nav {
+                display: flex !important;
+                flex-direction: row;
+                border: none;
+                padding: 0;
+            }
+            .site-footer {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <a class="skip-link" href="#main">Skip to main content</a>
+
+        <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+        <div class="modal-overlay" id="authModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="modal">
+                <button class="modal-close" id="modalClose" aria-label="Close dialog">&times;</button>
+                <h2 id="modalTitle">Sign in to Kernel</h2>
+                <p id="modalSubtext">Access your documentation and team settings.</p>
+                <form id="authForm" novalidate>
+                    <div class="form-group" id="nameGroup">
+                        <label for="authName">Full name</label>
+                        <input type="text" id="authName" placeholder="Jane Developer" autocomplete="name" />
+                    </div>
+                    <div class="form-group">
+                        <label for="authEmail">Email address</label>
+                        <input type="email" id="authEmail" placeholder="jane@company.com" autocomplete="email" required />
+                        <div class="form-error" id="emailError">Please enter a valid email address</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="authPassword">Password</label>
+                        <input type="password" id="authPassword" placeholder="At least 8 characters" autocomplete="current-password" required />
+                        <div class="form-error" id="passwordError">Password must be at least 8 characters</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="authSubmit">Sign in</button>
+                </form>
+                <div class="switch-action">
+                    <span id="switchText">Don't have an account?</span>
+                    <button type="button" id="switchMode">Create one</button>
+                </div>
+            </div>
+        </div>
+
+        <header class="site-header" role="banner">
+            <div class="container">
+                <div class="logo" id="logoLink" role="button" tabindex="0" aria-label="Kernel home">
+                    <span class="logo-icon" aria-hidden="true">K</span>
+                    Kernel <span>docs</span>
+                </div>
+                <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="primaryNav" aria-label="Toggle navigation">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <nav id="primaryNav" class="nav" role="navigation" aria-label="Primary navigation">
+                    <a id="navFeatures">Product</a>
+                    <a id="navDemo">Documentation</a>
+                    <a id="navBlog">Blog</a>
+                    <a id="navChangelog">Changelog</a>
+                    <div class="nav-actions" id="navActions">
+                        <div class="user-info" id="userInfo" style="display:none;">
+                            <span class="user-name" id="userName">User</span>
+                            <span class="user-plan" id="userPlan">Free</span>
+                            <button class="btn btn-secondary btn-sm" id="signOutBtn">Sign out</button>
+                        </div>
+                        <div id="authButtons">
+                            <button class="btn btn-secondary btn-sm" id="signInBtn">Sign in</button>
+                            <button class="btn btn-primary btn-sm" id="getStartedNav">Get started</button>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <main id="main">
+            <section class="hero" aria-labelledby="hero-title">
+                <div class="container">
+                    <div class="hero-content">
+                        <span class="hero-badge">
+                            <span aria-hidden="true">&bull;</span> Now in public beta
+                        </span>
+                        <h1 id="hero-title">
+                            Documentation that <span class="highlight">developers actually want to use</span>
+                        </h1>
+                        <p>
+                            Kernel helps teams create beautiful, searchable, and
+                            maintainable API documentation without the usual
+                            complexity or ugly default themes.
+                        </p>
+                        <div class="hero-actions">
+                            <button class="btn btn-primary" id="heroStartBtn">Start for free</button>
+                            <button class="btn btn-secondary" id="heroDemoBtn">View demo</button>
+                        </div>
+                        <p style="font-size:clamp(0.75rem, 0.9vw, 0.875rem);color:var(--color-text-tertiary);margin-top:var(--space-xs);">
+                            No credit card required. Free for teams up to 5.
+                        </p>
+                    </div>
+                    <div class="hero-image">
+                        <div class="code-block" role="img" aria-label="Code example showing Kernel documentation setup">
+                            <span class="comment"># kernel.config.yml</span><br />
+                            <span class="keyword">project</span>:<br />
+                            &nbsp;&nbsp;<span class="variable">name</span>: <span class="string">"Payments API"</span><br />
+                            &nbsp;&nbsp;<span class="variable">version</span>: <span class="string">"v2.4.1"</span><br />
+                            <span class="keyword">theme</span>:<br />
+                            &nbsp;&nbsp;<span class="variable">style</span>: <span class="string">"clean"</span><br />
+                            &nbsp;&nbsp;<span class="variable">accent</span>: <span class="string">"#2B6CB0"</span><br />
+                            <span class="keyword">navigation</span>:<br />
+                            &nbsp;&nbsp;- <span class="variable">title</span>: <span class="string">"Getting Started"</span><br />
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="variable">path</span>: <span class="string">"/guides"</span><br />
+                            &nbsp;&nbsp;- <span class="variable">title</span>: <span class="string">"API Reference"</span><br />
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="variable">path</span>: <span class="string">"/api"</span><br />
+                            <span class="keyword">plugins</span>:<br />
+                            &nbsp;&nbsp;- <span class="function">search</span><br />
+                            &nbsp;&nbsp;- <span class="function">code-snippets</span><br />
+                            &nbsp;&nbsp;- <span class="function">version-switcher</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="features" id="features" aria-labelledby="features-title">
+                <div class="container">
+                    <div class="features-header">
+                        <h2 id="features-title">Built for teams that ship</h2>
+                        <p>Everything you need to create docs that your users and your team will love.</p>
+                    </div>
+                    <div class="features-grid">
+                        <article class="feature-card">
+                            <div class="icon" aria-hidden="true">⌘</div>
+                            <h3>Instant search</h3>
+                            <p>Full-text search that actually works. Results appear as you type, with keyboard shortcuts for power users.</p>
+                        </article>
+                        <article class="feature-card">
+                            <div class="icon" aria-hidden="true">◇</div>
+                            <h3>Versioned docs</h3>
+                            <p>Maintain multiple API versions side-by-side. Users can switch versions with a single click.</p>
+                        </article>
+                        <article class="feature-card">
+                            <div class="icon" aria-hidden="true">⎔</div>
+                            <h3>Code snippets</h3>
+                            <p>Auto-generated snippets in 12+ languages. Copy with one click, zero friction.</p>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <section class="code-demo" id="demo" aria-labelledby="demo-title">
+                <div class="container">
+                    <div class="code-demo-content">
+                        <h2 id="demo-title">Generate docs from your OpenAPI spec</h2>
+                        <p>
+                            Kernel ingests your OpenAPI / Swagger file and generates
+                            a complete, beautiful documentation site in seconds.
+                        </p>
+                        <ul>
+                            <li>Interactive API explorer</li>
+                            <li>Automatic request/response examples</li>
+                            <li>Schema validation and type hints</li>
+                            <li>Dark mode included</li>
+                        </ul>
+                    </div>
+                    <div class="code-block" role="img" aria-label="OpenAPI specification being loaded into Kernel">
+                        <span class="comment"># Terminal</span><br />
+                        $ <span class="function">kernel</span> init<br />
+                        <span class="comment">Configuration created</span><br />
+                        $ <span class="function">kernel</span> generate --spec openapi.json<br />
+                        <span class="comment">Parsed 42 endpoints</span><br />
+                        <span class="comment">Generated 18 pages</span><br />
+                        <span class="comment">Built in 1.2s</span><br />
+                        $ <span class="function">kernel</span> serve<br />
+                        <span class="comment">&rarr; http://localhost:3000</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="pricing" id="pricing" aria-labelledby="pricing-title">
+                <div class="container">
+                    <div class="pricing-header">
+                        <h2 id="pricing-title">Simple, transparent pricing</h2>
+                        <p>Start for free. Scale as you grow. No surprises.</p>
+                    </div>
+                    <div class="pricing-card">
+                        <div class="plan-name">Professional</div>
+                        <div class="price">$29 <span>/ month</span></div>
+                        <p class="description">For teams that need more than the basics.</p>
+                        <ul class="features-list">
+                            <li>Unlimited API endpoints</li>
+                            <li>Up to 25 team members</li>
+                            <li>Custom domain &amp; branding</li>
+                            <li>Priority email support</li>
+                            <li>Analytics dashboard</li>
+                        </ul>
+                        <button class="btn btn-accent" id="pricingBtn" style="width:100%;justify-content:center;">Get started</button>
+                        <p style="font-size:0.8125rem;color:var(--color-text-tertiary);margin-top:var(--space-md);">
+                            Free tier includes 5 team members and unlimited public docs.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer" role="contentinfo">
+            <div class="container">
+                <div class="copyright">
+                    &copy; 2026 Kernel. All rights reserved.
+                </div>
+                <nav class="footer-links" aria-label="Footer navigation">
+                    <a id="footerPrivacy">Privacy</a>
+                    <a id="footerTerms">Terms</a>
+                    <a id="footerGithub">GitHub</a>
+                    <a id="footerTwitter">Twitter</a>
+                </nav>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ============================================
+            // CONFIGURATION - CHANGE THIS FOR PRODUCTION
+            // ============================================
+            // For local development:
+            // const API_BASE = '/api';
+            
+            // For production on Render:
+            const API_BASE = 'https://kernel-website-25sx.onrender.com';
+            
+            // For production on Railway:
+            // const API_BASE = 'https://kernel.up.railway.app/api';
+            
+            // Auto-detect environment (uncomment this for automatic detection):
+            // const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            //     ? '/api'
+            //     : 'https://kernel-api.onrender.com/api';
+
+            // ============================================
+            // STATE
+            // ============================================
+            let currentUser = null;
+            let authToken = null;
+            let isSignUpMode = false;
+
+            // ============================================
+            // DOM REFS
+            // ============================================
+            const toast = document.getElementById('toast');
+            let toastTimeout;
+
+            const authModal = document.getElementById('authModal');
+            const modalClose = document.getElementById('modalClose');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalSubtext = document.getElementById('modalSubtext');
+            const switchText = document.getElementById('switchText');
+            const switchMode = document.getElementById('switchMode');
+            const authForm = document.getElementById('authForm');
+            const authSubmit = document.getElementById('authSubmit');
+            const authName = document.getElementById('authName');
+            const authEmail = document.getElementById('authEmail');
+            const authPassword = document.getElementById('authPassword');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+
+            const signInBtn = document.getElementById('signInBtn');
+            const signOutBtn = document.getElementById('signOutBtn');
+            const getStartedNav = document.getElementById('getStartedNav');
+            const heroStartBtn = document.getElementById('heroStartBtn');
+            const heroDemoBtn = document.getElementById('heroDemoBtn');
+            const pricingBtn = document.getElementById('pricingBtn');
+
+            const userInfo = document.getElementById('userInfo');
+            const userName = document.getElementById('userName');
+            const userPlan = document.getElementById('userPlan');
+            const authButtons = document.getElementById('authButtons');
+
+            const navToggle = document.getElementById('navToggle');
+            const primaryNav = document.getElementById('primaryNav');
+
+            // ============================================
+            // API HELPERS
+            // ============================================
+            async function apiRequest(endpoint, options = {}) {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                };
+
+                if (authToken) {
+                    headers['Authorization'] = 'Bearer ' + authToken;
+                }
+
+                const response = await fetch(API_BASE + endpoint, {
+                    ...options,
+                    headers
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Something went wrong');
+                }
+
+                return data;
+            }
+
+            // ============================================
+            // TOAST
+            // ============================================
+            function showToast(message, type) {
+                if (toastTimeout) clearTimeout(toastTimeout);
+                toast.textContent = message;
+                toast.className = 'toast';
+                if (type) {
+                    toast.classList.add(type);
+                }
+                toast.classList.add('show');
+                toastTimeout = setTimeout(function() {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+
+            // ============================================
+            // AUTH
+            // ============================================
+            function openModal(mode) {
+                isSignUpMode = mode === 'signup';
+                if (isSignUpMode) {
+                    modalTitle.textContent = 'Create your account';
+                    modalSubtext.textContent = 'Start building better documentation today.';
+                    authSubmit.textContent = 'Create account';
+                    switchText.textContent = 'Already have an account?';
+                    switchMode.textContent = 'Sign in';
+                    authName.style.display = 'block';
+                    authName.required = true;
+                } else {
+                    modalTitle.textContent = 'Sign in to Kernel';
+                    modalSubtext.textContent = 'Access your documentation and team settings.';
+                    authSubmit.textContent = 'Sign in';
+                    switchText.textContent = "Don't have an account?";
+                    switchMode.textContent = 'Create one';
+                    authName.style.display = 'none';
+                    authName.required = false;
+                }
+                authForm.reset();
+                emailError.classList.remove('visible');
+                passwordError.classList.remove('visible');
+                authEmail.classList.remove('error');
+                authPassword.classList.remove('error');
+                authModal.classList.add('active');
+                authEmail.focus();
+            }
+
+            function closeModal() {
+                authModal.classList.remove('active');
+            }
+
+            async function handleAuthSubmit(e) {
+                e.preventDefault();
+
+                const email = authEmail.value.trim();
+                const password = authPassword.value;
+                const name = authName.value.trim();
+
+                let valid = true;
+                var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                if (!emailRe.test(email)) {
+                    emailError.classList.add('visible');
+                    authEmail.classList.add('error');
+                    valid = false;
+                } else {
+                    emailError.classList.remove('visible');
+                    authEmail.classList.remove('error');
+                }
+
+                if (password.length < 8) {
+                    passwordError.classList.add('visible');
+                    authPassword.classList.add('error');
+                    valid = false;
+                } else {
+                    passwordError.classList.remove('visible');
+                    authPassword.classList.remove('error');
+                }
+
+                if (isSignUpMode && !name) {
+                    valid = false;
+                    showToast('Please enter your full name', 'error');
+                }
+
+                if (!valid) return;
+
+                authSubmit.disabled = true;
+                authSubmit.textContent = 'Processing...';
+
+                try {
+                    var response;
+                    if (isSignUpMode) {
+                        response = await apiRequest('/auth/signup', {
+                            method: 'POST',
+                            body: JSON.stringify({ email: email, password: password, name: name })
+                        });
+                    } else {
+                        response = await apiRequest('/auth/signin', {
+                            method: 'POST',
+                            body: JSON.stringify({ email: email, password: password })
+                        });
+                    }
+
+                    authToken = response.token;
+                    currentUser = response.user;
+                    localStorage.setItem('kernel_token', authToken);
+                    localStorage.setItem('kernel_user', JSON.stringify(currentUser));
+                    updateUI();
+                    closeModal();
+                    showToast(isSignUpMode ? 'Account created successfully' : 'Welcome back', 'success');
+
+                } catch (error) {
+                    showToast(error.message, 'error');
+                } finally {
+                    authSubmit.disabled = false;
+                    authSubmit.textContent = isSignUpMode ? 'Create account' : 'Sign in';
+                }
+            }
+
+            async function signOut() {
+                try {
+                    if (authToken) {
+                        await apiRequest('/auth/signout', { method: 'POST' });
+                    }
+                } catch (error) {
+                    // Ignore
+                }
+                authToken = null;
+                currentUser = null;
+                localStorage.removeItem('kernel_token');
+                localStorage.removeItem('kernel_user');
+                updateUI();
+                showToast('Signed out successfully');
+            }
+
+            function updateUI() {
+                if (currentUser && authToken) {
+                    userInfo.style.display = 'flex';
+                    authButtons.style.display = 'none';
+                    userName.textContent = currentUser.name;
+                    var planName = currentUser.plan.charAt(0).toUpperCase() + currentUser.plan.slice(1);
+                    userPlan.textContent = planName;
+                } else {
+                    userInfo.style.display = 'none';
+                    authButtons.style.display = 'flex';
+                }
+            }
+
+            // ============================================
+            // NAVIGATION
+            // ============================================
+            function scrollToSection(id) {
+                var target = document.getElementById(id);
+                if (target) {
+                    var headerHeight = document.querySelector('.site-header').offsetHeight;
+                    var targetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 16;
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+
+            // ============================================
+            // INIT
+            // ============================================
+            function init() {
+                // Restore session
+                var savedToken = localStorage.getItem('kernel_token');
+                var savedUser = localStorage.getItem('kernel_user');
+                if (savedToken && savedUser) {
+                    authToken = savedToken;
+                    currentUser = JSON.parse(savedUser);
+                    updateUI();
+                    apiRequest('/auth/me')
+                        .then(function(data) {
+                            currentUser = data.user;
+                            localStorage.setItem('kernel_user', JSON.stringify(currentUser));
+                            updateUI();
+                        })
+                        .catch(function() {
+                            authToken = null;
+                            currentUser = null;
+                            localStorage.removeItem('kernel_token');
+                            localStorage.removeItem('kernel_user');
+                            updateUI();
+                        });
+                }
+
+                // Mobile nav
+                if (navToggle && primaryNav) {
+                    navToggle.addEventListener('click', function() {
+                        var isOpen = primaryNav.classList.toggle('is-open');
+                        navToggle.setAttribute('aria-expanded', isOpen);
+                    });
+
+                    document.addEventListener('keydown', function(e) {
+                        if (e.key === 'Escape' && primaryNav.classList.contains('is-open')) {
+                            primaryNav.classList.remove('is-open');
+                            navToggle.setAttribute('aria-expanded', 'false');
+                            navToggle.focus();
+                        }
+                    });
+
+                    var navItems = primaryNav.querySelectorAll('a, button');
+                    for (var i = 0; i < navItems.length; i++) {
+                        navItems[i].addEventListener('click', function() {
+                            if (window.innerWidth <= 768) {
+                                primaryNav.classList.remove('is-open');
+                                navToggle.setAttribute('aria-expanded', 'false');
+                            }
+                        });
+                    }
+                }
+
+                // Logo
+                document.getElementById('logoLink').addEventListener('click', function() {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    showToast('Back to top');
+                });
+
+                // Auth modal
+                signInBtn.addEventListener('click', function() {
+                    openModal('signin');
+                });
+
+                getStartedNav.addEventListener('click', function() {
+                    if (currentUser) {
+                        scrollToSection('pricing');
+                    } else {
+                        openModal('signup');
+                    }
+                });
+
+                heroStartBtn.addEventListener('click', function() {
+                    if (currentUser) {
+                        scrollToSection('pricing');
+                        showToast('Starting your free trial...');
+                    } else {
+                        openModal('signup');
+                    }
+                });
+
+                modalClose.addEventListener('click', closeModal);
+                authModal.addEventListener('click', function(e) {
+                    if (e.target === this) closeModal();
+                });
+
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && authModal.classList.contains('active')) {
+                        closeModal();
+                    }
+                });
+
+                switchMode.addEventListener('click', function() {
+                    openModal(isSignUpMode ? 'signin' : 'signup');
+                });
+
+                authForm.addEventListener('submit', handleAuthSubmit);
+
+                signOutBtn.addEventListener('click', signOut);
+
+                // Pricing
+                pricingBtn.addEventListener('click', function() {
+                    if (currentUser) {
+                        showToast('Upgrading to Professional plan...');
+                    } else {
+                        openModal('signup');
+                    }
+                });
+
+                // Navigation
+                document.getElementById('navFeatures').addEventListener('click', function() {
+                    scrollToSection('features');
+                });
+
+                document.getElementById('navDemo').addEventListener('click', function() {
+                    scrollToSection('demo');
+                });
+
+                heroDemoBtn.addEventListener('click', function() {
+                    scrollToSection('demo');
+                });
+
+                document.getElementById('navBlog').addEventListener('click', function() {
+                    showToast('Blog coming soon');
+                });
+
+                document.getElementById('navChangelog').addEventListener('click', function() {
+                    showToast('View our changelog on GitHub');
+                });
+
+                // Footer
+                document.getElementById('footerPrivacy').addEventListener('click', function() {
+                    showToast('Privacy policy page');
+                });
+
+                document.getElementById('footerTerms').addEventListener('click', function() {
+                    showToast('Terms of service');
+                });
+
+                document.getElementById('footerGithub').addEventListener('click', function() {
+                    showToast('github.com/kernel/docs');
+                });
+
+                document.getElementById('footerTwitter').addEventListener('click', function() {
+                    showToast('@kernel_docs on Twitter');
+                });
+
+                // Keyboard shortcut: / for search
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                        var target = e.target;
+                        if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+                            e.preventDefault();
+                            showToast('Search would open here');
+                        }
+                    }
+                });
+
+                // Active nav on scroll
+                var sections = ['features', 'demo', 'pricing'];
+                var navItems2 = [
+                    document.getElementById('navFeatures'),
+                    document.getElementById('navDemo')
+                ];
+
+                function updateActiveNav() {
+                    var current = '';
+                    for (var i = 0; i < sections.length; i++) {
+                        var section = document.getElementById(sections[i]);
+                        if (section) {
+                            var top = section.offsetTop - 100;
+                            if (window.pageYOffset >= top) {
+                                current = sections[i];
+                            }
+                        }
+                    }
+
+                    for (var j = 0; j < navItems2.length; j++) {
+                        navItems2[j].removeAttribute('aria-current');
+                    }
+
+                    if (current === 'features') {
+                        document.getElementById('navFeatures').setAttribute('aria-current', 'page');
+                    } else if (current === 'demo') {
+                        document.getElementById('navDemo').setAttribute('aria-current', 'page');
+                    }
+                }
+
+                var ticking = false;
+                window.addEventListener('scroll', function() {
+                    if (!ticking) {
+                        window.requestAnimationFrame(function() {
+                            updateActiveNav();
+                            ticking = false;
+                        });
+                        ticking = true;
+                    }
+                });
+
+                updateActiveNav();
+
+                console.log('Kernel server running');
+                console.log('Press / to search');
+            }
+
+            // Run on DOM ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+
+        })();
+    </script>
+</body>
+</html>
